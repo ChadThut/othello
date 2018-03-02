@@ -1,3 +1,5 @@
+/* Defines the player class functions. */
+
 #include "player.hpp"
 
 /*
