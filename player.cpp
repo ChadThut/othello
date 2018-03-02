@@ -1,10 +1,4 @@
-/* Defines the player class functions. */
-
 #include "player.hpp"
-
-
-
-// Chad has modified Player.cpp
 
 /*
  * Constructor for the player; initialize everything here. The side your AI is
@@ -20,6 +14,9 @@ Player::Player(Side side) {
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
+
+     Board board = Board();
+     Side side = side;
 }
 
 /*
@@ -46,5 +43,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */
+
+     /* Update the board with the opponent's move. */
+     board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
+
     return nullptr;
 }
