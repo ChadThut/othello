@@ -46,21 +46,19 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
      /* Update the board with the opponent's move. */
      board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
-     
-     
-     /* Loop through open spaces, return the first legal move */
-     
-     Move *current = new Move (0, 0);
-     for ( i = 0; i < 64; i ++ )
-     {
-		 current->setX(i / 8);
-		 current->setY(i % 8);
-		 
-		 if(checkMove(current, side)}
-		 {
-			 return current; 
-		 }
-	 }
-	
-     return nullptr;
+
+
+     for (int i = 0; i < 64; i++) {
+         Move *move = new Move(i / 8, i % 8);
+
+         if (board.checkMove(move, side)) {
+             /* Update the board with our move and return the move. */
+             board.doMove(move, side);
+             return move;
+         }
+
+         delete move;
+     }
+
+    return nullptr;
 }
