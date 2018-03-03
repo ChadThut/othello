@@ -47,18 +47,37 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      /* Update the board with the opponent's move. */
      board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
 
+     Move *best = nullptr;
+     int bestGained = 0;
 
      for (int i = 0; i < 64; i++) {
          Move *move = new Move(i / 8, i % 8);
 
          if (board.checkMove(move, side)) {
-             /* Update the board with our move and return the move. */
-             board.doMove(move, side);
-             return move;
+             /* Find the number of pieces gained when making this move. */
+             Board *copy = board.copy();
+             int before = copy->count(side);
+
+             copy->doMove(move, side);
+
+             int gained = copy->count(side) - before;
+
+             if (gained > bestGained) {
+                 bestGained = gained;
+                 best = move;
+             }
+
+             delete copy;
          }
 
-         delete move;
+         //delete move;
      }
 
-    return nullptr;
+     /* We don't need 'move' anymore. */
+     //delete move;
+
+     /* Do the best move. */
+     board.doMove(best, side);
+
+    return best;
 }
