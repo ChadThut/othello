@@ -47,5 +47,17 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      /* Update the board with the opponent's move. */
      board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
 
+     for (int i = 0; i < 64; i++) {
+         Move *move = new Move(i / 8, i % 8);
+
+         if (board.checkMove(move, side)) {
+             /* Update the board with our move and return the move. */
+             board.doMove(move, side);
+             return move;
+         }
+
+         delete move;
+     }
+
     return nullptr;
 }
