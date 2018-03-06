@@ -31,6 +31,7 @@ public:
 
     void setBoard(char data[]);
 
+    int simpleValue(Side side);
     int value(Side side);
 };
 

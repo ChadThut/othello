@@ -180,6 +180,14 @@ void Board::setBoard(char data[]) {
 }
 
 /*
+ * Use a naive approach to the board value by finding the net number of pieces
+ * for a given side.
+ */
+int Board::simpleValue(Side side) {
+    return count(side) - count(side == WHITE ? BLACK : WHITE);
+}
+
+/*
  * Use a heuristic to approximate the value of the board.
  */
 int Board::value(Side side) {

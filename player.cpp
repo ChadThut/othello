@@ -26,6 +26,13 @@ Player::~Player() {
 }
 
 /*
+ * Sets the player's board to the given board.
+ */
+void Player::loadBoard(Board *b) {
+     board = *b;
+ }
+
+/*
  * Compute the next move given the opponent's last move. Your AI is
  * expected to keep track of the board on its own. If this is the first move,
  * or if the opponent passed on the last move, then opponentsMove will be
@@ -60,9 +67,17 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
              /* Use the board heuristic to find the best move. */
              Board *copy = board.copy();
              copy->doMove(move, side);
-             int value = copy->value(side);
 
-//             fprintf(stderr, "value: %d, (x, y): (%d, %d)\n", value, move->getX(), move->getY());
+             int value = 0;
+             //value = copy->value(side); // heuristic
+             if (testingMinimax) {
+                 value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false);
+             }
+             else {
+                 value = miniMax(3, (side == WHITE ? BLACK : WHITE), copy, false);
+             }
+
+             fprintf(stderr, "move: (%d, %d), value: %d\n", move->getX(), move->getY(), value);
 
              if (value > bestValue) {
                  bestValue = value;
@@ -79,13 +94,13 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
 
      if (best) {
-//         fprintf(stderr, "best move: (%d, %d)\n", best->getX(), best->getY());
+         fprintf(stderr, "best move: (%d, %d)\n", best->getX(), best->getY());
      }
      else {
-//         fprintf(stderr, "pass");
+         fprintf(stderr, "pass");
      }
 
-//     fprintf(stderr, "-------------------------------------\n");
+     fprintf(stderr, "-------------------------------------\n");
 
      /* We don't need 'move' anymore. */
      //delete move;
@@ -104,12 +119,17 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
 int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer)
 {
-	if (depth == 0||board->isDone())
+	if (depth == 0 || board->isDone())
 	{
+        /* Use the naive heuristic for testing minimax. */
+        if (testingMinimax) {
+            return board->simpleValue(side);
+        }
 		return board->value(side);
 	}
-	int bestVal , v; 
-	if (maxPlayer) 
+
+	int bestVal, v;
+	if (maxPlayer)
 	{
 		bestVal = -1e8;
 		Move *move = new Move(0, 0);
@@ -148,6 +168,5 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer)
 
 		}
 		return bestVal;
-	    
 	}
 }
