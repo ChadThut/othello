@@ -48,7 +48,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
 
      Move *best = nullptr;
-     int bestValue = INT_MIN;
+     int bestValue = -1e8;
 
      for (int i = 0; i < 64; i++) {
          Move *move = new Move(i / 8, i % 8);
@@ -90,24 +90,24 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     return best;
 }
 
-int miniMax(int depth, Side side, Board board)
+int miniMax(int depth, Side side, Board *board, bool maxPlayer)
 {
-	if (depth == 0)
+	if (depth == 0||board->isDone())
 	{
-		return board.value(side);
+		return board->value(side);
 	}
 	int bestVal , v; 
-	if (depth % 2 == 0) //even number of depth --> you are the maximizing player
+	if (maxPlayer) 
 	{
 		bestVal = -1e8;
 		for(int i = 0; i < 64; i++)
 		{
 			Move *move = new Move(i / 8, i % 8);
-			if (board.checkMove(move, side))
+			if (board->checkMove(move, side))
 			{
-				Board *copy = board.copy();
+				Board *copy = board->copy();
 				copy->doMove(move, side);
-				v = miniMax(depth - 1, (side == WHITE ? BLACK : WHITE), *copy);
+				v = miniMax(depth - 1, (side == WHITE ? BLACK : WHITE), copy, false);
 				bestVal = max(v, bestVal);
 				delete copy;
 			}
@@ -121,11 +121,11 @@ int miniMax(int depth, Side side, Board board)
 	    for(int i = 0; i < 64; i ++)
 	    {
 			Move *move = new Move(i / 8, i % 8);
-			if(board.checkMove(move, side))
+			if(board->checkMove(move, side))
 			{
-				Board *copy = board.copy();
+				Board *copy = board->copy();
 				copy->doMove(move, side);
-				v = miniMax(depth -1, side, *copy);
+				v = miniMax(depth -1, (side == WHITE ? BLACK : WHITE), copy, true);
 				bestVal = min(bestVal, v);
 				delete copy;
 			}
