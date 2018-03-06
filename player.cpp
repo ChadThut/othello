@@ -46,72 +46,53 @@ void Player::loadBoard(Board *b) {
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
+    /* Update the board with the opponent's move. */
+    board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
 
-     /* Update the board with the opponent's move. */
-     board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
+    Move *best = new Move(-1, -1);
+    Move *move = new Move (0, 0);
+    int bestValue = -1e9;
 
-     Move *best = new Move(-1, -1);
-     Move *move = new Move (0, 0);
-     int bestValue = -1e8;
+    for (int i = 0; i < 64; i++) {
+        move->setX(i / 8);
+        move->setY(i % 8);
 
-     for (int i = 0; i < 64; i++) {
-		 move->setX(i / 8);
-		 move->setY(i % 8);
-         //Move *move = new Move(i / 8, i % 8);
+        if (board.checkMove(move, side)) {
+            /* Use the board heuristic to find the best move. */
+            Board *copy = board.copy();
+            copy->doMove(move, side);
 
-         if (board.checkMove(move, side)) {
-             /* Use the board heuristic to find the best move. */
-             Board *copy = board.copy();
-             copy->doMove(move, side);
+            int value = 0;
+            //value = copy->value(side); // heuristic
 
-             int value = 0;
-             //value = copy->value(side); // heuristic
-             if (testingMinimax) {
-                 value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false);
-             }
-             else {
-                 value = miniMax(5, (side == WHITE ? BLACK : WHITE), copy, false);
-             }
+            /* Use minimax. */
+            if (testingMinimax) {
+                value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false);
+            }
+            else {
+                value = miniMax(5, (side == WHITE ? BLACK : WHITE), copy, false);
+            }
 
-             fprintf(stderr, "move: (%d, %d), value: %d\n", move->getX(), move->getY(), value);
-
-             if (value > bestValue) {
-                 bestValue = value;
-                 best->setX(move->getX());
-                 best->setY(move->getY());
-             }
+            /* Update the best move. */
+            if (value > bestValue) {
+                bestValue = value;
+                best->setX(move->getX());
+                best->setY(move->getY());
+            }
 
             delete copy;
-         }
+        }
+    }
 
-        //delete move;
-     }
+    /* We don't need 'move' anymore. */
+    delete move;
 
-
-
-     if (best) {
-         fprintf(stderr, "best move: (%d, %d)\n", best->getX(), best->getY());
-     }
-     else {
-         fprintf(stderr, "pass");
-     }
-
-     fprintf(stderr, "-------------------------------------\n");
-
-     /* We don't need 'move' anymore. */
-     //delete move;
-
-     /* Do the best move. */\
-
-
+    /* Do the best move. */
     if(best->getX() == -1)
     {
-		best = nullptr;
-	}
+        delete best;
+        best = nullptr;
+    }
     board.doMove(best, side);
 
     return best;
