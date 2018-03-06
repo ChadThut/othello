@@ -178,3 +178,48 @@ void Board::setBoard(char data[]) {
         }
     }
 }
+
+/*
+ * Use a heuristic to approximate the value of the board.
+ */
+int Board::value(Side side) {
+    /* Calculate the value for black, then negate the value if it's white. */
+    int res = 0;
+
+    for (int i = 0; i < 64; i++) {
+        if (i == 0 || i == 7 || i == 56 || i == 63) {
+            /* These are the corners. */
+            if (taken[i]) {
+                res += 50 * (black[i] ? 1 : -1);
+            }
+        }
+        else if (i == 9 || i == 14 || i == 49 || i == 54) {
+            /* These are the squares just inside the corners. */
+            if (taken[i]) {
+                res += 10 * (black[i] ? -1 : 1);
+            }
+        }
+        else if (i == 1 || i == 6 || i == 8 || i == 15 || i == 48 || i == 55
+                    || i == 57 || i == 62) {
+            /* These are the edge squares right next to a corner. */
+            if (taken[i]) {
+                res += 20 * (black[i] ? -1 : 1);
+            }
+        }
+        else if (i / 8 == 0 || i / 8 == 7 || i % 8 == 0 || i % 8 == 7) {
+            /* These are the other edge squares. */
+            if (taken[i]) {
+                res += 7 * (black[i] ? 1 : -1);
+            }
+        }
+        else {
+            /* These are the middle squares. */
+            if (taken[i]) {
+                res += (black[i] ? 1 : -1);
+            }
+        }
+    }
+
+    /* The value was calculated for black. */
+    return (side == BLACK ? res : -res);
+}

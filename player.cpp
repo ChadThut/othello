@@ -48,22 +48,21 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
 
      Move *best = nullptr;
-     int bestGained = 0;
+     int bestValue = INT_MIN;
 
      for (int i = 0; i < 64; i++) {
          Move *move = new Move(i / 8, i % 8);
 
          if (board.checkMove(move, side)) {
-             /* Find the number of pieces gained when making this move. */
+             /* Use the board heuristic to find the best move. */
              Board *copy = board.copy();
-             int before = copy->count(side);
-
              copy->doMove(move, side);
+             int value = copy->value(side);
 
-             int gained = copy->count(side) - before;
+//             fprintf(stderr, "value: %d, (x, y): (%d, %d)\n", value, move->getX(), move->getY());
 
-             if (gained > bestGained) {
-                 bestGained = gained;
+             if (value > bestValue) {
+                 bestValue = value;
                  best = move;
              }
 
@@ -72,6 +71,15 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
          //delete move;
      }
+
+     if (best) {
+//         fprintf(stderr, "best move: (%d, %d)\n", best->getX(), best->getY());
+     }
+     else {
+//         fprintf(stderr, "pass");
+     }
+
+//     fprintf(stderr, "-------------------------------------\n");
 
      /* We don't need 'move' anymore. */
      //delete move;
