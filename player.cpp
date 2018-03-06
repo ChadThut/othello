@@ -67,10 +67,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                  best = move;
              }
 
-             delete copy;
+            delete copy;
          }
 
-         //delete move;
+        // delete move;
      }
 
      /* We don't need 'move' anymore. */
@@ -80,4 +80,50 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      board.doMove(best, side);
 
     return best;
+}
+
+int miniMax(int depth, Side side, Board board)
+{
+	if (depth == 0)
+	{
+		return board.value(side);
+	}
+	int bestVal , v; 
+	if (depth % 2 == 0) //even number of depth --> you are the maximizing player
+	{
+		bestVal = -1e8;
+		for(int i = 0; i < 64; i++)
+		{
+			Move *move = new Move(i / 8, i % 8);
+			if (board.checkMove(move, side))
+			{
+				Board *copy = board.copy();
+				copy->doMove(move, side);
+				v = miniMax(depth - 1, (side == WHITE ? BLACK : WHITE), *copy);
+				bestVal = max(v, bestVal);
+				delete copy;
+			}
+
+		}
+		return bestVal;
+	}
+	else
+	{
+	    bestVal = 1e8;
+	    for(int i = 0; i < 64; i ++)
+	    {
+			Move *move = new Move(i / 8, i % 8);
+			if(board.checkMove(move, side))
+			{
+				Board *copy = board.copy();
+				copy->doMove(move, side);
+				v = miniMax(depth -1, side, *copy);
+				bestVal = min(bestVal, v);
+				delete copy;
+			}
+
+		}
+		return bestVal;
+	    
+	}
 }
