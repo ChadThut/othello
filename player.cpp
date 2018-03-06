@@ -47,11 +47,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      /* Update the board with the opponent's move. */
      board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
 
-     Move *best = nullptr;
+     Move *best = new Move(-1, -1);
+     Move *move = new Move (0, 0);
      int bestValue = -1e8;
 
      for (int i = 0; i < 64; i++) {
-         Move *move = new Move(i / 8, i % 8);
+		 move->setX(i / 8);
+		 move->setY(i % 8);
+         //Move *move = new Move(i / 8, i % 8);
 
          if (board.checkMove(move, side)) {
              /* Use the board heuristic to find the best move. */
@@ -63,14 +66,17 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
              if (value > bestValue) {
                  bestValue = value;
-                 best = move;
+                 best->setX(move->getX());
+                 best->setY(move->getY());
              }
 
             delete copy;
          }
 
-        // delete move;
+        //delete move;
      }
+
+
 
      if (best) {
 //         fprintf(stderr, "best move: (%d, %d)\n", best->getX(), best->getY());
@@ -84,13 +90,19 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      /* We don't need 'move' anymore. */
      //delete move;
 
-     /* Do the best move. */
-     board.doMove(best, side);
-
+     /* Do the best move. */\
+    
+    
+    if(best->getX() == -1)
+    {
+		best = nullptr;
+	}
+    board.doMove(best, side);
+    
     return best;
 }
 
-int miniMax(int depth, Side side, Board *board, bool maxPlayer)
+int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer)
 {
 	if (depth == 0||board->isDone())
 	{
@@ -100,9 +112,11 @@ int miniMax(int depth, Side side, Board *board, bool maxPlayer)
 	if (maxPlayer) 
 	{
 		bestVal = -1e8;
+		Move *move = new Move(0, 0);
 		for(int i = 0; i < 64; i++)
 		{
-			Move *move = new Move(i / 8, i % 8);
+		 move->setX(i / 8);
+		 move->setY(i % 8);
 			if (board->checkMove(move, side))
 			{
 				Board *copy = board->copy();
@@ -118,9 +132,11 @@ int miniMax(int depth, Side side, Board *board, bool maxPlayer)
 	else
 	{
 	    bestVal = 1e8;
+	    Move *move = new Move(0, 0);
 	    for(int i = 0; i < 64; i ++)
 	    {
-			Move *move = new Move(i / 8, i % 8);
+		 move->setX(i / 8);
+		 move->setY(i % 8);
 			if(board->checkMove(move, side))
 			{
 				Board *copy = board->copy();
