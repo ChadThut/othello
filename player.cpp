@@ -46,79 +46,63 @@ void Player::loadBoard(Board *b) {
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
 
-     /* Update the board with the opponent's move. */
-     board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
+    /* Update the board with the opponent's move. */
+    board.doMove(opponentsMove, (side == WHITE ? BLACK : WHITE));
 
-     Move *best = new Move(-1, -1);
-     Move *move = new Move (0, 0);
-     int bestValue = -1e8;
+    Move *best = new Move(-1, -1);
+    Move *move = new Move (0, 0);
+    int bestValue = -1e9;
 
-     for (int i = 0; i < 64; i++) {
-		 move->setX(i / 8);
-		 move->setY(i % 8);
-         //Move *move = new Move(i / 8, i % 8);
+    for (int i = 0; i < 64; i++) {
+        move->setX(i / 8);
+        move->setY(i % 8);
 
-         if (board.checkMove(move, side)) {
-             /* Use the board heuristic to find the best move. */
-             Board *copy = board.copy();
-             copy->doMove(move, side);
+        if (board.checkMove(move, side)) {
+            /* Use the board heuristic to find the best move. */
+            Board *copy = board.copy();
+            copy->doMove(move, side);
 
-             int value = 0;
-             //value = copy->value(side); // heuristic
-             if (testingMinimax) {
-                 value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false);
-             }
-             else {
-                 value = miniMax(5, (side == WHITE ? BLACK : WHITE), copy, false);
-             }
+            int value = 0;
+            //value = copy->value(side); // heuristic
 
-             fprintf(stderr, "move: (%d, %d), value: %d\n", move->getX(), move->getY(), value);
+            /* Use minimax. */
+            if (testingMinimax) {
+                value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
+            }
+            else {
+                value = miniMax(7, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
+            }
 
-             if (value > bestValue) {
-                 bestValue = value;
-                 best->setX(move->getX());
-                 best->setY(move->getY());
-             }
+            /* Update the best move. */
+            if (value > bestValue) {
+                bestValue = value;
+                best->setX(move->getX());
+                best->setY(move->getY());
+            }
 
             delete copy;
-         }
+        }
+    }
 
-        //delete move;
-     }
+    /* We don't need 'move' anymore. */
+    delete move;
 
-
-
-     if (best) {
-         fprintf(stderr, "best move: (%d, %d)\n", best->getX(), best->getY());
-     }
-     else {
-         fprintf(stderr, "pass");
-     }
-
-     fprintf(stderr, "-------------------------------------\n");
-
-     /* We don't need 'move' anymore. */
-     //delete move;
-
-     /* Do the best move. */\
-    
-    
+    /* Do the best move. */
     if(best->getX() == -1)
     {
-		best = nullptr;
-	}
+        delete best;
+        best = nullptr;
+    }
     board.doMove(best, side);
-    
+
     return best;
 }
 
-int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer)
+int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int a, int b)
 {
+	int alpha = a;
+	int beta = b;
 	if (depth == 0 || board->isDone())
 	{
         /* Use the naive heuristic for testing minimax. */
@@ -128,10 +112,10 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer)
 		return board->value(side);
 	}
 
-	int bestVal, v;
+	int v;
 	if (maxPlayer)
 	{
-		bestVal = -1e8;
+		v = -1e8;
 		Move *move = new Move(0, 0);
 		for(int i = 0; i < 64; i++)
 		{
@@ -141,17 +125,20 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer)
 			{
 				Board *copy = board->copy();
 				copy->doMove(move, side);
-				v = miniMax(depth - 1, (side == WHITE ? BLACK : WHITE), copy, false);
-				bestVal = max(v, bestVal);
+				v = max(v, miniMax(depth - 1, (side == WHITE ? BLACK : WHITE), copy, false, alpha, beta));
+				alpha = max(alpha, v);
 				delete copy;
+				if(beta <= alpha)
+					break;
+				
 			}
 
 		}
-		return bestVal;
+		return v;
 	}
 	else
 	{
-	    bestVal = 1e8;
+	    v = 1e8;
 	    Move *move = new Move(0, 0);
 	    for(int i = 0; i < 64; i ++)
 	    {
@@ -161,12 +148,14 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer)
 			{
 				Board *copy = board->copy();
 				copy->doMove(move, side);
-				v = miniMax(depth -1, (side == WHITE ? BLACK : WHITE), copy, true);
-				bestVal = min(bestVal, v);
+				v = min(v, miniMax(depth -1, (side == WHITE ? BLACK : WHITE), copy, true, alpha, beta));
+				beta = min(beta, v);
 				delete copy;
+				if(beta <= alpha)
+					break;
 			}
 
 		}
-		return bestVal;
+		return v;
 	}
 }
