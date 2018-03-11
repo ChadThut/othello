@@ -74,7 +74,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                  value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false);
              }
              else {
-                 value = miniMax(3, (side == WHITE ? BLACK : WHITE), copy, false);
+                 value = miniMax(5, (side == WHITE ? BLACK : WHITE), copy, false);
              }
 
              fprintf(stderr, "move: (%d, %d), value: %d\n", move->getX(), move->getY(), value);
