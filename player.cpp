@@ -134,16 +134,17 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int alph
 			if (board->checkMove(move, side))
 			{
 				Board *copy = board->copy();
-				copy->doMove(move, side);
+			    copy->doMove(move, side);
 				v = max(v, miniMax(depth - 1, (side == WHITE ? BLACK : WHITE), copy, false, alpha, beta));
 				alpha = max(alpha, v);
 				delete copy;
 				if(beta <= alpha)
 					break;
-
 			}
-
 		}
+
+        delete move;
+
 		return (v == -inf ? board->value(side) : v);
 	}
 	else
@@ -164,8 +165,10 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int alph
 				if(beta <= alpha)
 					break;
 			}
-
 		}
+
+        delete move;
+
 		return (v == inf ? board->value(side) : v);
 	}
 }
