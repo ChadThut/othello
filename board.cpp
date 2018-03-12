@@ -209,7 +209,7 @@ int Board::countBlack() {
     int res = 0;
 
     for (int i = 0; i < 64; i++) {
-        res += GET(black, i);
+        res += (GET(black, i) ? 1 : 0);
     }
 
     return res;
@@ -224,8 +224,8 @@ int Board::countWhite() {
     int res = 0;
 
     for (int i = 0; i < 64; i++) {
-        res += GET(taken, i);
-        res -= GET(black, i);
+        res += (GET(taken, i) ? 1 : 0);
+        res -= (GET(black, i) ? 1 : 0);
     }
 
     return res;
