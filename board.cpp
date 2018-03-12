@@ -1,15 +1,58 @@
 #include "board.hpp"
 
+#define SET(num, i) ((num) |= (1ull << (i)))
+#define GET(num, i) ((num) &  (1ull << (i)))
+#define SET_ZERO(num, i) ((num) &= ~(1ull << (i)))
+
+#include <iostream>
+using namespace std;
+
 /*
  * Make a standard 8x8 othello board and initialize it to the standard setup.
  */
 Board::Board() {
-    taken.set(3 + 8 * 3);
-    taken.set(3 + 8 * 4);
-    taken.set(4 + 8 * 3);
-    taken.set(4 + 8 * 4);
-    black.set(4 + 8 * 3);
-    black.set(3 + 8 * 4);
+    taken = 0ull;
+    black = 0ull;
+
+/*
+    SET(taken, 1);
+    SET(taken, 2);
+    SET(taken, 3);
+    SET(black, 3);
+
+    cerr << "taken 1 " << GET(taken, 1) << endl;
+    cerr << "taken 2 " << GET(taken, 2) << endl;
+    cerr << "taken 5 " << GET(taken, 5) << endl;
+*/
+
+    SET(taken, 3 + 8 * 3);
+    SET(taken, 3 + 8 * 4);
+    SET(taken, 4 + 8 * 3);
+    SET(taken, 4 + 8 * 4);
+    SET(black, 4 + 8 * 3);
+    SET(black, 3 + 8 * 4);
+
+/*
+    cerr << "taken:" << endl;
+    for (int i = 0; i < 8; i++) {
+        for (int k = 0; k < 8; k++) {
+            cerr << (GET(taken, i + 8*k) ? 1 : 0);
+        }
+        cerr << endl;
+    }
+
+    cerr << endl;
+
+    cerr << "black:" << endl;
+    for (int i = 0; i < 8; i++) {
+        for (int k = 0; k < 8; k++) {
+            cerr << (GET(black, i + 8*k) ? 1 : 0);
+        }
+        cerr << endl;
+    }
+
+    cerr << endl;
+*/
 }
 
 /*
@@ -29,16 +72,25 @@ Board *Board::copy() {
 }
 
 bool Board::occupied(int x, int y) {
-    return taken[x + 8*y];
+    //return taken[x + 8*y];
+    return GET(taken, x + 8*y);
 }
 
 bool Board::get(Side side, int x, int y) {
-    return occupied(x, y) && (black[x + 8*y] == (side == BLACK));
+    //return occupied(x, y) && (black[x + 8*y] == (side == BLACK));
+    return occupied(x, y) && (!GET(black, x + 8*y) == (side != BLACK));
 }
 
 void Board::set(Side side, int x, int y) {
-    taken.set(x + 8*y);
-    black.set(x + 8*y, side == BLACK);
+    SET(taken, x + 8*y);
+
+    if (side == BLACK) {
+        SET(black, x + 8*y);
+    }
+    else {
+        SET_ZERO(black, x + 8*y);
+    }
+    //black.set(x + 8*y, side == BLACK);
 }
 
 bool Board::onBoard(int x, int y) {
@@ -152,14 +204,31 @@ int Board::count(Side side) {
  * Current count of black stones.
  */
 int Board::countBlack() {
-    return black.count();
+    //return black.count();
+
+    int res = 0;
+
+    for (int i = 0; i < 64; i++) {
+        res += GET(black, i);
+    }
+
+    return res;
 }
 
 /*
  * Current count of white stones.
  */
 int Board::countWhite() {
-    return taken.count() - black.count();
+    //return taken.count() - black.count();
+
+    int res = 0;
+
+    for (int i = 0; i < 64; i++) {
+        res += GET(taken, i);
+        res -= GET(black, i);
+    }
+
+    return res;
 }
 
 /*
@@ -167,14 +236,20 @@ int Board::countWhite() {
  * piece and 'b' indicates a black piece. Mainly for testing purposes.
  */
 void Board::setBoard(char data[]) {
-    taken.reset();
-    black.reset();
+    //taken.reset();
+    //black.reset();
+    taken = 0ll;
+    black = 0ll;
+
     for (int i = 0; i < 64; i++) {
         if (data[i] == 'b') {
-            taken.set(i);
-            black.set(i);
+            //taken.set(i);
+            //black.set(i);
+            SET(taken, i);
+            SET(black, i);
         } if (data[i] == 'w') {
-            taken.set(i);
+            //taken.set(i);
+            SET(taken, i);
         }
     }
 }
@@ -197,33 +272,41 @@ int Board::value(Side side) {
     for (int i = 0; i < 64; i++) {
         if (i == 0 || i == 7 || i == 56 || i == 63) {
             /* These are the corners. */
-            if (taken[i]) {
-                res += 50 * (black[i] ? 1 : -1);
+            if (GET(taken, i)) {
+                //res += 50 * (black[i] ? 1 : -1);
+                res += 50 * (GET(black, i) ? 1 : -1);
             }
         }
         else if (i == 9 || i == 14 || i == 49 || i == 54) {
             /* These are the squares just inside the corners. */
-            if (taken[i]) {
-                res += 10 * (black[i] ? -1 : 1);
+            if (GET(taken, i)) {
+                //res += 10 * (black[i] ? -1 : 1);
+                res += 10 * (GET(black, i) ? -1 : 1);
             }
         }
         else if (i == 1 || i == 6 || i == 8 || i == 15 || i == 48 || i == 55
                     || i == 57 || i == 62) {
             /* These are the edge squares right next to a corner. */
-            if (taken[i]) {
-                res += 20 * (black[i] ? -1 : 1);
+            //if (taken[i]) {
+            if (GET(taken, i)) {
+                //res += 20 * (black[i] ? -1 : 1);
+                res += 20 * (GET(black, i) ? -1 : 1);
             }
         }
         else if (i / 8 == 0 || i / 8 == 7 || i % 8 == 0 || i % 8 == 7) {
             /* These are the other edge squares. */
-            if (taken[i]) {
-                res += 7 * (black[i] ? 1 : -1);
+            //if (taken[i]) {
+            if (GET(taken, i)) {
+                //res += 7 * (black[i] ? 1 : -1);
+                res += 7 * (GET(black, i) ? 1 : -1);
             }
         }
         else {
             /* These are the middle squares. */
-            if (taken[i]) {
-                res += (black[i] ? 1 : -1);
+            //if (taken[i]) {
+            if (GET(taken, i)) {
+                //res += (black[i] ? 1 : -1);
+                res += (GET(black, i) ? 1 : -1);
             }
         }
     }
