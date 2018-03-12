@@ -17,6 +17,7 @@ Player::Player(Side s) {
 
      board = Board();
      side = s;
+     endgame = false;
 }
 
 /*
@@ -54,6 +55,11 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     Move *move = new Move (0, 0);
     int bestValue = -1e9;
 
+    /* Check if the game is near the end. */
+    if (board.countBlack() + board.countWhite() >= 50) {
+        endgame = true;
+    }
+
     for (int i = 0; i < 64; i++) {
         move->setX(i / 8);
         move->setY(i % 8);
@@ -66,12 +72,16 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
             int value = 0;
             //value = copy->value(side); // heuristic
 
+            if (endgame) {
+                value = miniMax(20, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
+            }
+
             /* Use minimax. */
             if (testingMinimax) {
                 value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
             }
             else {
-                value = miniMax(7, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
+                value = miniMax(5, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
             }
 
             /* Update the best move. */
@@ -99,15 +109,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     return best;
 }
 
-int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int a, int b)
+int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int alpha, int beta)
 {
     int inf = 1e8;
-	int alpha = a;
-	int beta = b;
+
 	if (depth == 0 || board->isDone())
 	{
-        /* Use the naive heuristic for testing minimax. */
-        if (testingMinimax) {
+        /* Use the naive heuristic for testing minimax and for endgame. */
+        if (testingMinimax || endgame) {
             return board->simpleValue(side);
         }
 		return board->value(side);
