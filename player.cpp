@@ -81,7 +81,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                 value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
             }
             else {
-                value = miniMax(5, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
+                value = miniMax(7, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
             }
 
             /* Update the best move. */
