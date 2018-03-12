@@ -20,6 +20,7 @@ public:
     bool testingMinimax;
 
 private:
+    bool endgame;
     Side side;
     Board board;
 };
