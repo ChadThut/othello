@@ -261,7 +261,24 @@ void Board::setBoard(char data[]) {
 int Board::simpleValue(Side side) {
     return count(side) - count(side == WHITE ? BLACK : WHITE);
 }
+/*
+ *  Calculate the 'mobility' of a given side (number of available moves)
+ */
 
+int Board::mobility(Side side)
+{
+	int count = 0;
+	Move *move = new Move(0, 0);
+	for(int i = 0; i < 64; i ++)
+	{
+		move->setX(i / 8);
+		move->setY(i % 8);
+			if(checkMove(move, side))
+				count ++;
+	}
+	return count;
+				
+}
 /*
  * Use a heuristic to approximate the value of the board.
  */

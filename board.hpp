@@ -33,6 +33,7 @@ public:
 
     int simpleValue(Side side);
     int value(Side side);
+    int mobility(Side side);
 };
 
 #endif
