@@ -101,6 +101,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
 int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int a, int b)
 {
+    int inf = 1e8;
 	int alpha = a;
 	int beta = b;
 	if (depth == 0 || board->isDone())
@@ -115,7 +116,7 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int a, i
 	int v;
 	if (maxPlayer)
 	{
-		v = -1e8;
+		v = -inf;
 		Move *move = new Move(0, 0);
 		for(int i = 0; i < 64; i++)
 		{
@@ -130,15 +131,15 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int a, i
 				delete copy;
 				if(beta <= alpha)
 					break;
-				
+
 			}
 
 		}
-		return v;
+		return (v == -inf ? board->value(side) : v);
 	}
 	else
 	{
-	    v = 1e8;
+	    v = inf;
 	    Move *move = new Move(0, 0);
 	    for(int i = 0; i < 64; i ++)
 	    {
@@ -156,6 +157,6 @@ int Player::miniMax(int depth, Side side, Board *board, bool maxPlayer, int a, i
 			}
 
 		}
-		return v;
+		return (v == inf ? board->value(side) : v);
 	}
 }
