@@ -54,11 +54,12 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     Move *best = new Move(-1, -1);
     Move *move = new Move (0, 0);
     int bestValue = -1e9;
-
     /* Check if the game is near the end. */
     if (board.countBlack() + board.countWhite() >= 50) {
         endgame = true;
     }
+    
+    
 
     for (int i = 0; i < 64; i++) {
         move->setX(i / 8);

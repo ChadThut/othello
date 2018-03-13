@@ -28,8 +28,10 @@ public:
     int count(Side side);
     int countBlack();
     int countWhite();
-
+	long long getTaken();
+	long long getBlack();
     void setBoard(char data[]);
+    void setInt(Side side, int a);
 
     int simpleValue(Side side);
     int value(Side side);

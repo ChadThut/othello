@@ -92,6 +92,27 @@ void Board::set(Side side, int x, int y) {
     }
     //black.set(x + 8*y, side == BLACK);
 }
+/* Sets a board position and side based on a single 0-63 int*/
+void Board::setInt(Side side, int a) {
+	SET(taken, a);
+	
+	if(side == BLACK) {
+		SET(black, a);
+	}
+	else {
+		SET_ZERO(black, a);
+	}
+	
+}
+long long Board::getTaken()
+{
+	return taken;
+}
+
+long long Board::getBlack()
+{
+	return black;
+}
 
 bool Board::onBoard(int x, int y) {
     return(0 <= x && x < 8 && 0 <= y && y < 8);
@@ -326,7 +347,10 @@ int Board::value(Side side) {
                 res += (GET(black, i) ? 1 : -1);
             }
         }
+        
     }
+    res += mobility(side == BLACK? BLACK: WHITE)*10/(countBlack()+countWhite());
+    
 
     /* The value was calculated for black. */
     return (side == BLACK ? res : -res);
