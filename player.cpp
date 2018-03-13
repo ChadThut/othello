@@ -9,12 +9,6 @@ Player::Player(Side s) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 
-    /*
-     * TODO: Do any initialization you need to do here (setting up the board,
-     * precalculating things, etc.) However, remember that you will only have
-     * 30 seconds.
-     */
-
      board = Board();
      side = s;
      endgame = false;
@@ -55,11 +49,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     Move *move = new Move (0, 0);
     int bestValue = -1e9;
     /* Check if the game is near the end. */
-    if (board.countBlack() + board.countWhite() >= 50) {
+    if (board.countBlack() + board.countWhite() >= 56) {
         endgame = true;
     }
-    
-    
 
     for (int i = 0; i < 64; i++) {
         move->setX(i / 8);
@@ -71,10 +63,23 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
             copy->doMove(move, side);
 
             int value = 0;
-            //value = copy->value(side); // heuristic
+            int depth = 7;
+            int depth2 = 20;
+
+            if (msLeft < 1000 * 20) {
+                depth = 5;
+            }
+            if (msLeft < 1000 * 5) {
+                depth = 3;
+                depth2 = 5;
+            }
+            if (msLeft < 1000) {
+                depth = 1;
+                depth2 = 1;
+            }
 
             if (endgame) {
-                value = miniMax(20, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
+                value = miniMax(depth2, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
             }
 
             else {
@@ -82,7 +87,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                     value = miniMax(1, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
                 }
                 else {
-                    value = miniMax(7, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
+                    value = miniMax(depth, (side == WHITE ? BLACK : WHITE), copy, false, -1e8, 1e8);
                 }
             }
 
