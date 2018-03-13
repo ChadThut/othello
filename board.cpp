@@ -95,14 +95,14 @@ void Board::set(Side side, int x, int y) {
 /* Sets a board position and side based on a single 0-63 int*/
 void Board::setInt(Side side, int a) {
 	SET(taken, a);
-	
+
 	if(side == BLACK) {
 		SET(black, a);
 	}
 	else {
 		SET_ZERO(black, a);
 	}
-	
+
 }
 long long Board::getTaken()
 {
@@ -298,7 +298,7 @@ int Board::mobility(Side side)
 				count ++;
 	}
 	return count;
-				
+
 }
 /*
  * Use a heuristic to approximate the value of the board.
@@ -347,9 +347,8 @@ int Board::value(Side side) {
                 res += (GET(black, i) ? 1 : -1);
             }
         }
-        
+
     }
-    res += mobility(side == BLACK? BLACK: WHITE)*10/(countBlack()+countWhite());
     
 
     /* The value was calculated for black. */
